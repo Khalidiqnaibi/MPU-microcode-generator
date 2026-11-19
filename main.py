@@ -37,6 +37,14 @@ class MPU_microcode_generator:
 
         return word
 
+    def pack_1bit_weights(self,weights_1d: np.ndarray) -> bytes:
+        bits = (weights_1d.ravel()> 0).astype(np.uint8)
+        rem = (-len(bits))% 8
+        if rem:
+            bits = np.pad(bits,(0,rem),constrant_values=0)
+        packed = np.packbits(bits,bitorder="big")
+        return packed.tobytes()
+
     def layout_layer(self, layer_name: str, weight_tensor: np.ndarray) -> bytes:
         print(f"Compiling layer {layer_name} with weight tensor shape {weight_tensor.shape}")
         out_feature,in_feature = weight_tensor.shape
